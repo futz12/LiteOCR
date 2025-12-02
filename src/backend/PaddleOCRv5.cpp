@@ -1,0 +1,284 @@
+#include "BaseInfer.h"
+
+#include <ncnn/gpu.h>
+#include <ncnn/mat.h>
+
+namespace LiteOCR {
+    bool PaddleDetector::loadModel(const char* paramPath, const char* binPath, const InferOption &opt) {
+        if (opt.gpuDeviceId != -1) {
+            if (ncnn::get_gpu_count() <= 0) {
+                fprintf(stderr, "[LiteOCR]Your Device don`t have any vulkan device. Switch to cpu mode\n");
+            } else if (ncnn::get_gpu_count() <= opt.gpuDeviceId) {
+                fprintf(stderr, "[LiteOCR]Your Device don`t have gpu device %d. Switch to cpu mode\n", opt.gpuDeviceId);
+            } else {
+                model.set_vulkan_device(opt.gpuDeviceId);
+            }
+        }
+        model.opt.num_threads = opt.numThreads;
+        if (opt.useFp16) {
+            model.opt.use_fp16_arithmetic = true;
+            model.opt.use_fp16_storage = true;
+            model.opt.use_fp16_packed = true;
+        }
+        if (opt.useInt8) {
+            model.opt.use_int8_arithmetic = true;
+            model.opt.use_int8_storage = true;
+            model.opt.use_int8_packed = true;
+        }
+        int ret = 0;
+        ret = model.load_param(paramPath);
+        if (ret == -1) {
+            fprintf(stderr, "[LiteOCR]Failed to load PaddleOCRv5 param file from %s\n", paramPath);
+            return false;
+        }
+        ret = model.load_model(binPath);
+        if (ret == -1) {
+            fprintf(stderr, "[LiteOCR]Failed to load PaddleOCRv5 bin file from %s\n", binPath);
+            return false;
+        }
+        return true;
+    }
+
+    bool PaddleDetector::loadModelFromBuffer(const char *paramBuffer, const unsigned char *binBuffer, const InferOption &opt) {
+        if (opt.gpuDeviceId != -1) {
+            if (ncnn::get_gpu_count() <= 0) {
+                fprintf(stderr, "[LiteOCR]Your Device don`t have any vulkan device. Switch to cpu mode\n");
+            } else if (ncnn::get_gpu_count() <= opt.gpuDeviceId) {
+                fprintf(stderr, "[LiteOCR]Your Device don`t have gpu device %d. Switch to cpu mode\n", opt.gpuDeviceId);
+            } else {
+                model.set_vulkan_device(opt.gpuDeviceId);
+            }
+        }
+        model.opt.num_threads = opt.numThreads;
+        if (opt.useFp16) {
+            model.opt.use_fp16_arithmetic = true;
+            model.opt.use_fp16_storage = true;
+            model.opt.use_fp16_packed = true;
+        }
+        if (opt.useInt8) {
+            model.opt.use_int8_arithmetic = true;
+            model.opt.use_int8_storage = true;
+            model.opt.use_int8_packed = true;
+        }
+        int ret = 0;
+        ret = model.load_param_mem(paramBuffer);
+        if (ret == -1) {
+            fprintf(stderr, "[LiteOCR]Failed to load PaddleOCRv5 param from buffer\n");
+            return false;
+        }
+        ret = model.load_model(paramBuffer);
+        if (ret == -1) {
+            fprintf(stderr, "[LiteOCR]Failed to load PaddleOCRv5 bin from buffer\n");
+            return false;
+        }
+        return true;
+    }
+
+    cv::Mat PaddleDetector::forward(const cv::Mat& input) {
+        ncnn::Mat in = ncnn::Mat::from_pixels(input.data, ncnn::Mat::PIXEL_BGR, input.cols, input.rows);
+        // pad to stride
+        int w = in.w;;
+        int h = in.h;
+        int wpad = (w + stride - 1) / stride * stride - w;
+        int hpad = (h + stride - 1) / stride * stride - h;
+        ncnn::Mat in_pad;
+        ncnn::copy_make_border(in, in_pad, hpad / 2, hpad - hpad / 2, wpad / 2, wpad - wpad / 2, ncnn::BORDER_CONSTANT, 114.f);
+        in_pad.substract_mean_normalize(mean_vals, norm_vals);
+
+        auto ex = model.create_extractor();
+        ex.input("in0", in);
+        ncnn::Mat out;
+        ex.extract("out0", out);
+        cv::Mat output(out.h, out.w, CV_32FC1, out.data);
+
+        // crop to original size
+        cv::Mat output_cropped = output(cv::Rect(wpad / 2, hpad / 2, w, h)).clone();
+        return output_cropped;
+    }
+
+    bool PaddleRecognizer::loadModel(const char* paramPath, const char* binPath, const InferOption &opt) {
+        if (opt.gpuDeviceId != -1) {
+            if (ncnn::get_gpu_count() <= 0) {
+                fprintf(stderr, "[LiteOCR]Your Device don`t have any vulkan device. Switch to cpu mode\n");
+            } else if (ncnn::get_gpu_count() <= opt.gpuDeviceId) {
+                fprintf(stderr, "[LiteOCR]Your Device don`t have gpu device %d. Switch to cpu mode\n", opt.gpuDeviceId);
+            } else {
+                model.set_vulkan_device(opt.gpuDeviceId);
+            }
+        }
+        model.opt.num_threads = opt.numThreads;
+        if (opt.useFp16) {
+            model.opt.use_fp16_arithmetic = true;
+            model.opt.use_fp16_storage = true;
+            model.opt.use_fp16_packed = true;
+        }
+        if (opt.useInt8) {
+            model.opt.use_int8_arithmetic = true;
+            model.opt.use_int8_storage = true;
+            model.opt.use_int8_packed = true;
+        }
+        int ret = 0;
+        ret = model.load_param(paramPath);
+        if (ret == -1) {
+            fprintf(stderr, "[LiteOCR]Failed to load PaddleOCRv5 param file from %s\n", paramPath);
+            return false;
+        }
+        ret = model.load_model(binPath);
+        if (ret == -1) {
+            fprintf(stderr, "[LiteOCR]Failed to load PaddleOCRv5 bin file from %s\n", binPath);
+            return false;
+        }
+        return true;
+    }
+
+    bool PaddleRecognizer::loadModelFromBuffer(const char* paramBuffer,const unsigned char* binBuffer, const InferOption &opt) {
+        if (opt.gpuDeviceId != -1) {
+            if (ncnn::get_gpu_count() <= 0) {
+                fprintf(stderr, "[LiteOCR]Your Device don`t have any vulkan device. Switch to cpu mode\n");
+            } else if (ncnn::get_gpu_count() <= opt.gpuDeviceId) {
+                fprintf(stderr, "[LiteOCR]Your Device don`t have gpu device %d. Switch to cpu mode\n", opt.gpuDeviceId);
+            } else {
+                model.set_vulkan_device(opt.gpuDeviceId);
+            }
+        }
+        model.opt.num_threads = opt.numThreads;
+        if (opt.useFp16) {
+            model.opt.use_fp16_arithmetic = true;
+            model.opt.use_fp16_storage = true;
+            model.opt.use_fp16_packed = true;
+        }
+        if (opt.useInt8) {
+            model.opt.use_int8_arithmetic = true;
+            model.opt.use_int8_storage = true;
+            model.opt.use_int8_packed = true;
+        }
+        int ret = 0;
+        ret = model.load_param_mem(paramBuffer);
+        if (ret == -1) {
+            fprintf(stderr, "[LiteOCR]Failed to load PaddleOCRv5 param from buffer\n");
+            return false;
+        }
+        ret = model.load_model(paramBuffer);
+        if (ret == -1) {
+            fprintf(stderr, "[LiteOCR]Failed to load PaddleOCRv5 bin from buffer\n");
+            return false;
+        }
+        return true;
+    }
+
+    cv::Mat PaddleRecognizer::forward(const cv::Mat& input) {
+        int target_width = input.cols * target_height / input.rows;
+        ncnn::Mat in = ncnn::Mat::from_pixels_resize(input.data, ncnn::Mat::PIXEL_BGR, input.cols, input.rows, target_width, target_height);
+        in.substract_mean_normalize(mean_vals, norm_vals);
+        auto ex = model.create_extractor();
+        ex.input("in0", in);
+        ncnn::Mat out;
+        ex.extract("out0", out);
+        cv::Mat output(out.h, out.w, CV_32FC1, out.data);
+        return output.clone();
+    }
+
+    std::vector<std::tuple<int, float, int>> CTCDecoder::decode(const cv::Mat& probs, int blank_index) {
+        std::vector<std::tuple<int, float, int>> result;
+        int prev_index = -1;
+        for (int i = 0; i < probs.rows; i++) {
+            // find max index
+            float max_value = -1e10;
+            int max_index = -1;
+            for (int j = 0; j < probs.cols; j++) {
+                float value = probs.at<float>(i, j);
+                if (value > max_value) {
+                    max_value = value;
+                    max_index = j;
+                }
+            }
+            // skip if blank or same as previous
+            if (max_index != blank_index && max_index != prev_index) {
+                result.push_back(std::make_tuple(max_index, max_value, i));
+            }
+            prev_index = max_index;
+        }
+        return result;
+    }
+
+    bool PaddleTextlineORI::loadModel(const char* paramPath, const char* binPath, const InferOption &opt) {
+        if (opt.gpuDeviceId != -1) {
+            if (ncnn::get_gpu_count() <= 0) {
+                fprintf(stderr, "[LiteOCR]Your Device don`t have any vulkan device. Switch to cpu mode\n");
+            } else if (ncnn::get_gpu_count() <= opt.gpuDeviceId) {
+                fprintf(stderr, "[LiteOCR]Your Device don`t have gpu device %d. Switch to cpu mode\n", opt.gpuDeviceId);
+            } else {
+                model.set_vulkan_device(opt.gpuDeviceId);
+            }
+        }
+        model.opt.num_threads = opt.numThreads;
+        if (opt.useFp16) {
+            model.opt.use_fp16_arithmetic = true;
+            model.opt.use_fp16_storage = true;
+            model.opt.use_fp16_packed = true;
+        }
+        if (opt.useInt8) {
+            model.opt.use_int8_arithmetic = true;
+            model.opt.use_int8_storage = true;
+            model.opt.use_int8_packed = true;
+        }
+        int ret = 0;
+        ret = model.load_param(paramPath);
+        if (ret == -1) {
+            fprintf(stderr, "[LiteOCR]Failed to load PaddleTextlineORI param file from %s\n", paramPath);
+            return false;
+        }
+        ret = model.load_model(binPath);
+        if (ret == -1) {
+            fprintf(stderr, "[LiteOCR]Failed to load PaddleTextlineORI bin file from %s\n", binPath);
+            return false;
+        }
+        return true;
+    }
+
+    bool PaddleTextlineORI::loadModelFromBuffer(const char* paramBuffer,const unsigned char* binBuffer, const InferOption &opt) {
+        if (opt.gpuDeviceId != -1) {
+            if (ncnn::get_gpu_count() <= 0) {
+                fprintf(stderr, "[LiteOCR]Your Device don`t have any vulkan device. Switch to cpu mode\n");
+            } else if (ncnn::get_gpu_count() <= opt.gpuDeviceId) {
+                fprintf(stderr, "[LiteOCR]Your Device don`t have gpu device %d. Switch to cpu mode\n", opt.gpuDeviceId);
+            } else {
+                model.set_vulkan_device(opt.gpuDeviceId);
+            }
+        }
+        model.opt.num_threads = opt.numThreads;
+        if (opt.useFp16) {
+            model.opt.use_fp16_arithmetic = true;
+            model.opt.use_fp16_storage = true;
+            model.opt.use_fp16_packed = true;
+        }
+        if (opt.useInt8) {
+            model.opt.use_int8_arithmetic = true;
+            model.opt.use_int8_storage = true;
+            model.opt.use_int8_packed = true;
+        }
+        int ret = 0;
+        ret = model.load_param_mem(paramBuffer);
+        if (ret == -1) {
+            fprintf(stderr, "[LiteOCR]Failed to load PaddleTextlineORI param from buffer\n");
+            return false;
+        }
+        ret = model.load_model(paramBuffer);
+        if (ret == -1) {
+            fprintf(stderr, "[LiteOCR]Failed to load PaddleTextlineORI bin from buffer\n");
+            return false;
+        }
+        return true;
+    }
+
+    int PaddleTextlineORI::forward(const cv::Mat& input) {
+        ncnn::Mat in = ncnn::Mat::from_pixels(input.data, ncnn::Mat::PIXEL_BGR, input.cols, input.rows);
+        in.substract_mean_normalize(mean_vals, norm_vals);
+        auto ex = model.create_extractor();
+        ex.input("in0", in);
+        ncnn::Mat out;
+        ex.extract("out0", out);
+        return out[0] > out[1] ? 0 : 1;
+    }
+
+}

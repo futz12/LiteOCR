@@ -1,0 +1,79 @@
+7767517
+77 79
+Input                    in0                      0 1 in0
+Convolution              conv_0                   1 1 in0 1 0=8 1=3 11=3 12=1 13=2 14=1 2=1 3=2 4=1 5=1 6=216
+HardSwish                hswish_25                1 1 1 2 0=0.166667 1=0.5
+ConvolutionDepthWise     convdw_60                1 1 2 3 0=8 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=72 7=8
+HardSwish                hswish_26                1 1 3 4 0=0.166667 1=0.5
+Convolution              conv_1                   1 1 4 5 0=8 1=1 11=1 12=1 13=1 14=0 2=1 3=1 4=0 5=1 6=64
+HardSwish                hswish_27                1 1 5 6 0=0.166667 1=0.5
+ConvolutionDepthWise     convdw_61                1 1 6 7 0=8 1=3 11=3 12=1 13=2 14=1 2=1 3=1 4=1 5=1 6=72 7=8
+HardSwish                hswish_28                1 1 7 8 0=0.166667 1=0.5
+Convolution              conv_2                   1 1 8 9 0=16 1=1 11=1 12=1 13=1 14=0 2=1 3=1 4=0 5=1 6=128
+HardSwish                hswish_29                1 1 9 10 0=0.166667 1=0.5
+ConvolutionDepthWise     convdw_62                1 1 10 11 0=16 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=144 7=16
+HardSwish                hswish_30                1 1 11 12 0=0.166667 1=0.5
+Convolution              conv_3                   1 1 12 13 0=16 1=1 11=1 12=1 13=1 14=0 2=1 3=1 4=0 5=1 6=256
+HardSwish                hswish_31                1 1 13 14 0=0.166667 1=0.5
+ConvolutionDepthWise     convdw_63                1 1 14 15 0=16 1=3 11=3 12=1 13=2 14=1 2=1 3=1 4=1 5=1 6=144 7=16
+HardSwish                hswish_32                1 1 15 16 0=0.166667 1=0.5
+Convolution              conv_4                   1 1 16 17 0=32 1=1 11=1 12=1 13=1 14=0 2=1 3=1 4=0 5=1 6=512
+HardSwish                hswish_33                1 1 17 18 0=0.166667 1=0.5
+ConvolutionDepthWise     convdw_64                1 1 18 19 0=32 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=288 7=32
+HardSwish                hswish_34                1 1 19 20 0=0.166667 1=0.5
+Convolution              conv_5                   1 1 20 21 0=32 1=1 11=1 12=1 13=1 14=0 2=1 3=1 4=0 5=1 6=1024
+HardSwish                hswish_35                1 1 21 22 0=0.166667 1=0.5
+ConvolutionDepthWise     convdw_65                1 1 22 23 0=32 1=3 11=3 12=1 13=2 14=1 2=1 3=1 4=1 5=1 6=288 7=32
+HardSwish                hswish_36                1 1 23 24 0=0.166667 1=0.5
+Convolution              conv_6                   1 1 24 25 0=64 1=1 11=1 12=1 13=1 14=0 2=1 3=1 4=0 5=1 6=2048
+HardSwish                hswish_37                1 1 25 26 0=0.166667 1=0.5
+ConvolutionDepthWise     convdw_66                1 1 26 27 0=64 1=5 11=5 12=1 13=1 14=2 2=1 3=1 4=2 5=1 6=1600 7=64
+HardSwish                hswish_38                1 1 27 28 0=0.166667 1=0.5
+Convolution              conv_7                   1 1 28 29 0=64 1=1 11=1 12=1 13=1 14=0 2=1 3=1 4=0 5=1 6=4096
+HardSwish                hswish_39                1 1 29 30 0=0.166667 1=0.5
+ConvolutionDepthWise     convdw_67                1 1 30 31 0=64 1=5 11=5 12=1 13=1 14=2 2=1 3=1 4=2 5=1 6=1600 7=64
+HardSwish                hswish_40                1 1 31 32 0=0.166667 1=0.5
+Convolution              conv_8                   1 1 32 33 0=64 1=1 11=1 12=1 13=1 14=0 2=1 3=1 4=0 5=1 6=4096
+HardSwish                hswish_41                1 1 33 34 0=0.166667 1=0.5
+ConvolutionDepthWise     convdw_68                1 1 34 35 0=64 1=5 11=5 12=1 13=1 14=2 2=1 3=1 4=2 5=1 6=1600 7=64
+HardSwish                hswish_42                1 1 35 36 0=0.166667 1=0.5
+Convolution              conv_9                   1 1 36 37 0=64 1=1 11=1 12=1 13=1 14=0 2=1 3=1 4=0 5=1 6=4096
+HardSwish                hswish_43                1 1 37 38 0=0.166667 1=0.5
+ConvolutionDepthWise     convdw_69                1 1 38 39 0=64 1=5 11=5 12=1 13=1 14=2 2=1 3=1 4=2 5=1 6=1600 7=64
+HardSwish                hswish_44                1 1 39 40 0=0.166667 1=0.5
+Convolution              conv_10                  1 1 40 41 0=64 1=1 11=1 12=1 13=1 14=0 2=1 3=1 4=0 5=1 6=4096
+HardSwish                hswish_45                1 1 41 42 0=0.166667 1=0.5
+ConvolutionDepthWise     convdw_70                1 1 42 43 0=64 1=5 11=5 12=1 13=1 14=2 2=1 3=1 4=2 5=1 6=1600 7=64
+HardSwish                hswish_46                1 1 43 44 0=0.166667 1=0.5
+Convolution              conv_11                  1 1 44 45 0=64 1=1 11=1 12=1 13=1 14=0 2=1 3=1 4=0 5=1 6=4096
+HardSwish                hswish_47                1 1 45 46 0=0.166667 1=0.5
+ConvolutionDepthWise     convdw_71                1 1 46 47 0=64 1=5 11=5 12=1 13=2 14=2 2=1 3=1 4=2 5=1 6=1600 7=64
+HardSwish                hswish_48                1 1 47 48 0=0.166667 1=0.5
+Split                    splitncnn_0              1 2 48 49 50
+Pooling                  gap_20                   1 1 50 51 0=1 4=1
+Convolution              convrelu_0               1 1 51 52 0=16 1=1 11=1 12=1 13=1 14=0 2=1 3=1 4=0 5=1 6=1024 9=1
+Convolution              conv_13                  1 1 52 53 0=64 1=1 11=1 12=1 13=1 14=0 2=1 3=1 4=0 5=1 6=1024
+HardSigmoid              hsigmoid_23              1 1 53 54 0=0.166667 1=0.5
+Reshape                  reshape_56               1 1 54 55 0=1 1=1 2=-1
+BinaryOp                 mul_0                    2 1 49 55 56 0=2
+Convolution              conv_14                  1 1 56 57 0=128 1=1 11=1 12=1 13=1 14=0 2=1 3=1 4=0 5=1 6=8192
+HardSwish                hswish_49                1 1 57 58 0=0.166667 1=0.5
+ConvolutionDepthWise     convdw_72                1 1 58 59 0=128 1=5 11=5 12=1 13=1 14=2 2=1 3=1 4=2 5=1 6=3200 7=128
+HardSwish                hswish_50                1 1 59 60 0=0.166667 1=0.5
+Split                    splitncnn_1              1 2 60 61 62
+Pooling                  gap_21                   1 1 62 63 0=1 4=1
+Convolution              convrelu_1               1 1 63 64 0=32 1=1 11=1 12=1 13=1 14=0 2=1 3=1 4=0 5=1 6=4096 9=1
+Convolution              conv_16                  1 1 64 65 0=128 1=1 11=1 12=1 13=1 14=0 2=1 3=1 4=0 5=1 6=4096
+HardSigmoid              hsigmoid_24              1 1 65 66 0=0.166667 1=0.5
+Reshape                  reshape_57               1 1 66 67 0=1 1=1 2=-1
+BinaryOp                 mul_1                    2 1 61 67 68 0=2
+Convolution              conv_17                  1 1 68 69 0=128 1=1 11=1 12=1 13=1 14=0 2=1 3=1 4=0 5=1 6=16384
+HardSwish                hswish_51                1 1 69 70 0=0.166667 1=0.5
+Pooling                  gap_22                   1 1 70 71 0=1 4=1
+Convolution              conv_18                  1 1 71 72 0=1280 1=1 11=1 12=1 13=1 14=0 2=1 3=1 4=0 5=0 6=163840
+HardSwish                hswish_52                1 1 72 73 0=0.166667 1=0.5
+Reshape                  reshape_58               1 1 73 74 0=1 1=1 2=-1
+BinaryOp                 mul_2                    1 1 74 75 0=2 1=1 2=0.8
+Reshape                  reshape_59               1 1 75 76 0=1280
+InnerProduct             linear_19                1 1 76 77 0=2 1=1 2=2560
+Softmax                  softmax_55               1 1 77 out0 0=0 1=1

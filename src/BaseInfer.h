@@ -1,18 +1,13 @@
 #pragma once
 
+#include "LiteOCREngine.h"
+
 #include <ncnn/net.h>
 #include <opencv2/core.hpp>
 #include <tuple>
 #include <vector>
 
 namespace LiteOCR {
-    struct InferOption {
-        int numThreads = 4;
-        int gpuDeviceId = -1; // -1 means CPU
-        bool useFp16 = false;
-        bool useInt8 = false;
-    };
-
     class BaseDetector {
     public:
         virtual ~BaseDetector() = default;
@@ -23,7 +18,7 @@ namespace LiteOCR {
     };
 
     class BaseRecognizer {
-        public:
+    public:
         virtual ~BaseRecognizer() = default;
         virtual bool loadModel(const char* paramPath, const char* binPath, const InferOption &opt) = 0;
         virtual bool loadModelFromBuffer(const char* paramBuffer,const unsigned char* binBuffer, const InferOption &opt) = 0;
@@ -40,7 +35,7 @@ namespace LiteOCR {
         virtual int forward(const cv::Mat& input) = 0;
     };
 
-    class PaddleDetector : BaseDetector {
+    class PaddleDetector : public BaseDetector {
     public:
         PaddleDetector() = default;
         ~PaddleDetector() override = default;
@@ -58,7 +53,7 @@ namespace LiteOCR {
         const int stride = 32;
     };
 
-    class PaddleRecognizer : BaseRecognizer {
+    class PaddleRecognizer : public BaseRecognizer {
     public:
         PaddleRecognizer() = default;
         ~PaddleRecognizer() override = default;
@@ -75,7 +70,7 @@ namespace LiteOCR {
         const int target_height = 48;
     };
 
-    class PaddleTextlineORI : BaseClassifier {
+    class PaddleTextlineORI : public BaseClassifier {
     public:
         PaddleTextlineORI() = default;
         ~PaddleTextlineORI() override = default;
@@ -101,25 +96,4 @@ namespace LiteOCR {
 
         static std::vector<std::tuple<int, float, int>> decode(const cv::Mat& probs, int blank_index = 0); // return token, prob, index
     };
-
-    struct Textline {
-        std::string text;
-        std::vector<float> anchors; // possition for each character in textline
-    };
-
-    struct TextBox {
-        cv::RotatedRect box;
-        int orientation; // 0: horizontal, 1: vertical
-        float score;
-    };
-
-    class OCREngine {
-    public:
-        OCREngine() = default;
-        ~OCREngine() = default;
-        virtual bool loadModel(const char* detParamPath, const char* detBinPath,
-                               const char* recParamPath, const char* recBinPath,
-                               const InferOption &detOpt, const InferOption &recOpt) = 0;
-        virtual std::vector<std::pair<std::string, float>> infer(const cv::Mat& input) = 0;
-    };
-}
+} // namespace LiteOCR

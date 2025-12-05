@@ -24,6 +24,8 @@ target("LiteOCR")
     set_kind("static")
     add_files("src/backend/*.cpp")
 
+    add_files("src/LiteOCREngine.cpp")
+
     add_packages("ncnn", "opencv-mobile")
 
 
@@ -41,3 +43,4 @@ end
 add_test("detector")
 add_test("recognizer")
 add_test("textlineori")
+add_test("baseocr")

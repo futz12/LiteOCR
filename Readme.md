@@ -4,7 +4,10 @@ LiteOCR is a lightweight Optical Character Recognition (OCR) library designed fo
 
 ## TODO
 
-[ ] Full Pipeline for PaddleOCR
-[ ] C API
-[ ] Support More Language
-[ ] HTTP API
+- [ ] Full Pipeline for PaddleOCR
+
+- [ ] C API
+
+- [ ] Support More Language
+
+- [ ] HTTP API

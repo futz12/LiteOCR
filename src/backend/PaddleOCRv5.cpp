@@ -295,7 +295,7 @@ namespace LiteOCR {
             cv::resize(crop_image, rsz_image, cv::Size(target_width, target_height));
         }
 
-        ncnn::Mat in = ncnn::Mat::from_pixels(rsz_image.data, ncnn::Mat::PIXEL_RGB, rsz_image.cols, rsz_image.rows);
+        ncnn::Mat in = ncnn::Mat::from_pixels(rsz_image.data, ncnn::Mat::PIXEL_BGR, rsz_image.cols, rsz_image.rows);
     
         in.substract_mean_normalize(mean_vals, norm_vals);
 

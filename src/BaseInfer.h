@@ -104,6 +104,20 @@ namespace LiteOCR {
         const int target_height = 224;
     };
 
+    class PaddleUVDoc 
+    {
+    public:
+        PaddleUVDoc() = default;
+        ~PaddleUVDoc() = default;
+
+        bool loadModel(const char* paramPath, const char* binPath, const InferOption &opt);
+        bool loadModelFromBuffer(const char* paramBuffer,const unsigned char* binBuffer, const InferOption &opt);
+        cv::Mat forward(const cv::Mat& input); // input u8c3, output u8c3
+    private:
+        ncnn::Net model;
+
+        const float norm_vals[3] = {1 / 255.f, 1 / 255.f, 1 / 255.f};
+    };
 
     class CTCDecoder {
     public:

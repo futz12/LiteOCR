@@ -379,6 +379,4 @@ std::pair<std::vector<TextBox>, std::vector<Textline>> LiteOCREngine::recognize(
     return impl->run(img);
 }
 
-
-
 } // namespace LiteOCR

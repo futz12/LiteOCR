@@ -1,0 +1,100 @@
+7767517
+98 118
+Input                    in0                      0 1 in0
+Split                    splitncnn_0              1 3 in0 1 2 3
+Interp                   upsample_90              1 1 3 4 0=2 3=712 4=488 6=1
+Convolution              convrelu_0               1 1 4 5 0=32 1=5 11=5 12=1 13=2 14=2 2=1 3=2 4=2 5=1 6=2400 9=1
+Convolution              convrelu_1               1 1 5 6 0=32 1=5 11=5 12=1 13=2 14=2 2=1 3=2 4=2 5=1 6=25600 9=1
+Split                    splitncnn_1              1 2 6 7 8
+Convolution              convrelu_2               1 1 8 9 0=32 1=5 11=5 12=1 13=1 14=2 2=1 3=1 4=2 5=1 6=25600 9=1
+Convolution              conv_4                   1 1 9 10 0=32 1=5 11=5 12=1 13=1 14=2 2=1 3=1 4=2 5=1 6=25600
+BinaryOp                 add_0                    2 1 10 7 11 0=0
+ReLU                     relu_52                  1 1 11 12
+Split                    splitncnn_2              1 2 12 13 14
+Convolution              convrelu_3               1 1 14 15 0=32 1=5 11=5 12=3 13=1 14=6 2=3 3=1 4=6 5=1 6=25600 9=1
+Convolution              conv_6                   1 1 15 16 0=32 1=5 11=5 12=3 13=1 14=6 2=3 3=1 4=6 5=1 6=25600
+BinaryOp                 add_1                    2 1 16 13 17 0=0
+ReLU                     relu_54                  1 1 17 18
+Split                    splitncnn_3              1 2 18 19 20
+Convolution              convrelu_4               1 1 20 21 0=32 1=5 11=5 12=3 13=1 14=6 2=3 3=1 4=6 5=1 6=25600 9=1
+Convolution              conv_8                   1 1 21 22 0=32 1=5 11=5 12=3 13=1 14=6 2=3 3=1 4=6 5=1 6=25600
+BinaryOp                 add_2                    2 1 22 19 23 0=0
+ReLU                     relu_56                  1 1 23 24
+Split                    splitncnn_4              1 2 24 25 26
+Convolution              conv_9                   1 1 26 27 0=64 1=5 11=5 12=1 13=2 14=2 2=1 3=2 4=2 5=1 6=51200
+Convolution              convrelu_5               1 1 25 28 0=64 1=5 11=5 12=1 13=2 14=2 2=1 3=2 4=2 5=1 6=51200 9=1
+Convolution              conv_11                  1 1 28 29 0=64 1=5 11=5 12=1 13=1 14=2 2=1 3=1 4=2 5=1 6=102400
+BinaryOp                 add_3                    2 1 29 27 30 0=0
+ReLU                     relu_58                  1 1 30 31
+Split                    splitncnn_5              1 2 31 32 33
+Convolution              convrelu_6               1 1 33 34 0=64 1=5 11=5 12=3 13=1 14=6 2=3 3=1 4=6 5=1 6=102400 9=1
+Convolution              conv_13                  1 1 34 35 0=64 1=5 11=5 12=3 13=1 14=6 2=3 3=1 4=6 5=1 6=102400
+BinaryOp                 add_4                    2 1 35 32 36 0=0
+ReLU                     relu_60                  1 1 36 37
+Split                    splitncnn_6              1 2 37 38 39
+Convolution              convrelu_7               1 1 39 40 0=64 1=5 11=5 12=3 13=1 14=6 2=3 3=1 4=6 5=1 6=102400 9=1
+Convolution              conv_15                  1 1 40 41 0=64 1=5 11=5 12=3 13=1 14=6 2=3 3=1 4=6 5=1 6=102400
+BinaryOp                 add_5                    2 1 41 38 42 0=0
+ReLU                     relu_62                  1 1 42 43
+Split                    splitncnn_7              1 2 43 44 45
+Convolution              convrelu_8               1 1 45 46 0=64 1=5 11=5 12=3 13=1 14=6 2=3 3=1 4=6 5=1 6=102400 9=1
+Convolution              conv_17                  1 1 46 47 0=64 1=5 11=5 12=3 13=1 14=6 2=3 3=1 4=6 5=1 6=102400
+BinaryOp                 add_6                    2 1 47 44 48 0=0
+ReLU                     relu_64                  1 1 48 49
+Split                    splitncnn_8              1 2 49 50 51
+Convolution              conv_18                  1 1 51 52 0=128 1=5 11=5 12=1 13=2 14=2 2=1 3=2 4=2 5=1 6=204800
+Convolution              convrelu_9               1 1 50 53 0=128 1=5 11=5 12=1 13=2 14=2 2=1 3=2 4=2 5=1 6=204800 9=1
+Convolution              conv_20                  1 1 53 54 0=128 1=5 11=5 12=1 13=1 14=2 2=1 3=1 4=2 5=1 6=409600
+BinaryOp                 add_7                    2 1 54 52 55 0=0
+ReLU                     relu_66                  1 1 55 56
+Split                    splitncnn_9              1 2 56 57 58
+Convolution              convrelu_10              1 1 58 59 0=128 1=5 11=5 12=3 13=1 14=6 2=3 3=1 4=6 5=1 6=409600 9=1
+Convolution              conv_22                  1 1 59 60 0=128 1=5 11=5 12=3 13=1 14=6 2=3 3=1 4=6 5=1 6=409600
+BinaryOp                 add_8                    2 1 60 57 61 0=0
+ReLU                     relu_68                  1 1 61 62
+Split                    splitncnn_10             1 2 62 63 64
+Convolution              convrelu_11              1 1 64 65 0=128 1=5 11=5 12=3 13=1 14=6 2=3 3=1 4=6 5=1 6=409600 9=1
+Convolution              conv_24                  1 1 65 66 0=128 1=5 11=5 12=3 13=1 14=6 2=3 3=1 4=6 5=1 6=409600
+BinaryOp                 add_9                    2 1 66 63 67 0=0
+ReLU                     relu_70                  1 1 67 68
+Split                    splitncnn_11             1 2 68 69 70
+Convolution              convrelu_12              1 1 70 71 0=128 1=5 11=5 12=3 13=1 14=6 2=3 3=1 4=6 5=1 6=409600 9=1
+Convolution              conv_26                  1 1 71 72 0=128 1=5 11=5 12=3 13=1 14=6 2=3 3=1 4=6 5=1 6=409600
+BinaryOp                 add_10                   2 1 72 69 73 0=0
+ReLU                     relu_72                  1 1 73 74
+Split                    splitncnn_12             1 2 74 75 76
+Convolution              convrelu_13              1 1 76 77 0=128 1=5 11=5 12=3 13=1 14=6 2=3 3=1 4=6 5=1 6=409600 9=1
+Convolution              conv_28                  1 1 77 78 0=128 1=5 11=5 12=3 13=1 14=6 2=3 3=1 4=6 5=1 6=409600
+BinaryOp                 add_11                   2 1 78 75 79 0=0
+ReLU                     relu_74                  1 1 79 80
+Split                    splitncnn_13             1 2 80 81 82
+Convolution              convrelu_14              1 1 82 83 0=128 1=5 11=5 12=3 13=1 14=6 2=3 3=1 4=6 5=1 6=409600 9=1
+Convolution              conv_30                  1 1 83 84 0=128 1=5 11=5 12=3 13=1 14=6 2=3 3=1 4=6 5=1 6=409600
+BinaryOp                 add_12                   2 1 84 81 85 0=0
+ReLU                     relu_76                  1 1 85 86
+Split                    splitncnn_14             1 6 86 87 88 89 90 91 92
+Convolution              convrelu_15              1 1 92 93 0=128 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=147456 9=1
+Convolution              convrelu_16              1 1 91 94 0=128 1=3 11=3 12=2 13=1 14=2 2=2 3=1 4=2 5=1 6=147456 9=1
+Convolution              convrelu_17              1 1 90 95 0=128 1=3 11=3 12=5 13=1 14=5 2=5 3=1 4=5 5=1 6=147456 9=1
+Convolution              convrelu_18              1 1 89 96 0=128 1=3 11=3 12=8 13=1 14=8 2=8 3=1 4=8 5=1 6=147456 9=1
+Convolution              convrelu_19              1 1 96 97 0=128 1=3 11=3 12=3 13=1 14=3 2=3 3=1 4=3 5=1 6=147456 9=1
+Convolution              convrelu_20              1 1 97 98 0=128 1=3 11=3 12=2 13=1 14=2 2=2 3=1 4=2 5=1 6=147456 9=1
+Convolution              convrelu_21              1 1 88 99 0=128 1=3 11=3 12=12 13=1 14=12 2=12 3=1 4=12 5=1 6=147456 9=1
+Convolution              convrelu_22              1 1 99 100 0=128 1=3 11=3 12=7 13=1 14=7 2=7 3=1 4=7 5=1 6=147456 9=1
+Convolution              convrelu_23              1 1 100 101 0=128 1=3 11=3 12=4 13=1 14=4 2=4 3=1 4=4 5=1 6=147456 9=1
+Convolution              convrelu_24              1 1 87 102 0=128 1=3 11=3 12=18 13=1 14=18 2=18 3=1 4=18 5=1 6=147456 9=1
+Convolution              convrelu_25              1 1 102 103 0=128 1=3 11=3 12=12 13=1 14=12 2=12 3=1 4=12 5=1 6=147456 9=1
+Convolution              convrelu_26              1 1 103 104 0=128 1=3 11=3 12=6 13=1 14=6 2=6 3=1 4=6 5=1 6=147456 9=1
+Concat                   cat_0                    6 1 93 94 95 98 101 104 105 0=0
+Convolution              convrelu_27              1 1 105 106 0=128 1=1 11=1 12=1 13=1 14=0 2=1 3=1 4=0 5=1 6=98304 9=1
+ExpandDims               unsqueeze_93             1 1 106 107 -23303=1,1
+Padding                  pad_47                   1 1 107 108 0=2 1=2 2=2 3=2 4=2 5=0 6=0 7=0 8=0
+Squeeze                  squeeze_91               1 1 108 109 -23303=1,1
+Convolution              conv_44                  1 1 109 110 0=32 1=5 11=5 12=1 13=1 14=0 2=1 3=1 4=0 5=1 6=102400
+PReLU                    prelu_46                 1 1 110 111 0=1
+ExpandDims               unsqueeze_94             1 1 111 112 -23303=1,1
+Padding                  pad_48                   1 1 112 113 0=2 1=2 2=2 3=2 4=2 5=0 6=0 7=0 8=0
+Squeeze                  squeeze_92               1 1 113 114 -23303=1,1
+Convolution              conv_45                  1 1 114 115 0=2 1=5 11=5 12=1 13=1 14=0 2=1 3=1 4=0 5=1 6=1600
+Interp                   F.upsample_52            2 1 115 1 116 0=2 5=1 6=1 9="1w,1h"
+GridSample               permutegridsample_0      2 1 2 116 out0 0=1 1=1 2=1 3=1

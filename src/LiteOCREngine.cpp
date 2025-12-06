@@ -280,6 +280,10 @@ public:
 
         for (int i = 0; i < rois.size(); i++) {
             cv::Mat roi = rois[i];
+            if (roi.isContinuous() == false) {
+                roi = roi.clone();
+            }
+
             if (textlineORI) {
                 int ori_label = textlineORI->forward(roi);
                 if (ori_label == 1) {
@@ -374,5 +378,7 @@ std::pair<std::vector<TextBox>, std::vector<Textline>> LiteOCREngine::recognize(
     cv::Mat img = cv::imdecode(data, cv::IMREAD_COLOR);
     return impl->run(img);
 }
+
+
 
 } // namespace LiteOCR

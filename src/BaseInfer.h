@@ -81,11 +81,27 @@ namespace LiteOCR {
     private:
         ncnn::Net model;
 
-        const float mean_vals[3] = {0.485f * 255.f, 0.456f * 255.f, 0.406f * 255.f};
-        const float norm_vals[3] = {1 / (0.229f * 255.f), 1 / (0.224f * 255.f), 1 / (0.225f * 255.f)};
-
-        const int target_weight = 160;
+        const float mean_vals[3] = {0.5f * 255.f, 0.5f * 255.f, 0.5f * 255.f};
+        const float norm_vals[3] = {1 / (0.5f * 255.f), 1 / (0.5f * 255.f), 1 / (0.5f * 255.f)};
+        const int target_width = 160;
         const int target_height = 80;
+    };
+
+    class PaddleDocORI : public BaseClassifier {
+    public:
+        PaddleDocORI() = default;
+        ~PaddleDocORI() override = default;
+
+        bool loadModel(const char* paramPath, const char* binPath, const InferOption &opt) override;
+        bool loadModelFromBuffer(const char* paramBuffer,const unsigned char* binBuffer, const InferOption &opt) override;
+        int forward(const cv::Mat& input) override;
+    private:
+        ncnn::Net model;
+
+        const float mean_vals[3] = {0.5 * 255.f, 0.5 * 255.f, 0.5 * 255.f};
+        const float norm_vals[3] = {1 / (0.5 * 255.f), 1 / (0.5 * 255.f), 1 / (0.5 * 255.f)};
+        const int target_width = 224;;
+        const int target_height = 224;
     };
 
 

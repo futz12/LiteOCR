@@ -14,13 +14,13 @@ LiteOCR is a lightweight Optical Character Recognition (OCR) library designed fo
 
 - [x] UVDOC
 
-- [] Layout
+- [ ] Layout
 
-- [] TableRec
+- [ ] TableRec
 
-- [] LatexOCR
+- [ ] LatexOCR
 
-- [] Textline SR
+- [ ] Textline SR
 
 ## TODO
 

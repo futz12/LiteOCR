@@ -57,9 +57,7 @@ private:
 
 public:
     LiteOCREngineImpl() {
-        detector = std::unique_ptr<LiteOCR::BaseDetector>(new LiteOCR::PaddleDetector());
-        recognizer = std::unique_ptr<LiteOCR::BaseRecognizer>(new LiteOCR::PaddleRecognizer());
-        textlineORI = std::unique_ptr<LiteOCR::BaseClassifier>(new LiteOCR::PaddleTextlineORI());
+        
     }
 
     bool loadModel(const char* detParamPath, const char* detBinPath,
@@ -68,19 +66,42 @@ public:
                    const char* oriParamPath,
                    const char* oriBinPath,
                    const LiteOCR::InferOption &opt) {
+        detector = std::unique_ptr<LiteOCR::BaseDetector>(new LiteOCR::PaddleDetector());
+        recognizer = std::unique_ptr<LiteOCR::BaseRecognizer>(new LiteOCR::PaddleRecognizer());
+
         bool ret = detector->loadModel(detParamPath, detBinPath, opt);
-        if (!ret) return false;
+        if (!ret) {
+            fprintf(stderr, "[LiteOCR]Failed to load detector model from %s and %s\n", detParamPath, detBinPath);
+            detector.reset();
+            recognizer.reset();
+            return false;
+        }
         ret = recognizer->loadModel(recParamPath, recBinPath, opt);
-        if (!ret) return false;
+        if (!ret) {
+            fprintf(stderr, "[LiteOCR]Failed to load recognizer model from %s and %s\n", recParamPath, recBinPath);
+            detector.reset();
+            recognizer.reset();
+            return false;
+        }
         if (oriParamPath && oriBinPath) {
+            textlineORI = std::unique_ptr<LiteOCR::BaseClassifier>(new LiteOCR::PaddleTextlineORI());
             ret = textlineORI->loadModel(oriParamPath, oriBinPath, opt);
-            if (!ret) return false;
+            if (!ret) {
+                fprintf(stderr, "[LiteOCR]Failed to load textline orientation model from %s and %s\n", oriParamPath, oriBinPath);
+                detector.reset();
+                recognizer.reset();
+                textlineORI.reset();
+                return false;
+            }
         }
         // load vocab
         vocab.clear();
         std::ifstream vocabFile(vocabPath);
         if (!vocabFile.is_open()) {
             fprintf(stderr, "[LiteOCR]Failed to open vocab file from %s\n", vocabPath);
+            detector.reset();
+            recognizer.reset();
+            textlineORI.reset();
             return false;
         }
         std::string line;
@@ -186,7 +207,7 @@ public:
         return textBoxes;
     }
 
-    std::vector<Textline> recognize(const cv::Mat &input, const std::vector<TextBox> &textBoxes)
+    std::vector<Textline> recognize(const cv::Mat &input, std::vector<TextBox> &textBoxes)
     {
         std::vector<Textline> results;
         std::vector<cv::Mat> rois;
@@ -257,7 +278,17 @@ public:
             rois.push_back(dst);
         }
 
-        for (const auto &roi : rois) {
+        for (int i = 0; i < rois.size(); i++) {
+            cv::Mat roi = rois[i];
+            if (textlineORI) {
+                int ori_label = textlineORI->forward(roi);
+                if (ori_label == 1) {
+                    // upside down
+                    cv::rotate(roi, roi, cv::ROTATE_180);
+                    textBoxes[i].box.angle += 180.0f;
+                }
+            }
+
             auto textline = recognizer->forward(roi);
             auto decoded = CTCDecoder::decode(textline);
 

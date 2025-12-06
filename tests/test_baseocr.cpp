@@ -3,14 +3,16 @@
 #include <vector>
 #include <fstream>
 int main() {
-    const char* inputfile = "test.png";
+    const char* inputfile = "test2.png";
     LiteOCR::LiteOCREngine engine;
     engine.loadModel(
         "./models/PP-OCRv5_mobile_det.param",
         "./models/PP-OCRv5_mobile_det.bin",
         "./models/PP-OCRv5_mobile_rec.param",
         "./models/PP-OCRv5_mobile_rec.bin",
-        "./models/PP-OCRv5_vocab.txt"
+        "./models/PP-OCRv5_vocab.txt",
+        "./models/PP-LCNet_x0_25_textline_ori.param",
+        "./models/PP-LCNet_x0_25_textline_ori.bin"
     );
     
     std::vector<unsigned char> imgData;

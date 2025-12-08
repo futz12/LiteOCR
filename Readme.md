@@ -16,7 +16,7 @@ LiteOCR is a lightweight Optical Character Recognition (OCR) library designed fo
 
 - [ ] Layout
 
-- [ ] TableRec
+- [x] TableRec
 
 - [ ] LatexOCR
 

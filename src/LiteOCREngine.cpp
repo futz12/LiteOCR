@@ -1,5 +1,7 @@
 #include "LiteOCREngine.h"
 #include "BaseInfer.h"
+#include "DocInfer.h"
+
 #include "opencv2/core/mat.hpp"
 #include "opencv2/core/types.hpp"
 #include "opencv2/imgproc.hpp"
@@ -333,6 +335,16 @@ public:
         }
         
         auto textBoxes = detect(input);
+        // sort textBoxes top to bottom, left to right
+        std::sort(textBoxes.begin(), textBoxes.end(), [](const TextBox &a, const TextBox &b) {
+            float ay = a.box.center.y;
+            float by = b.box.center.y;
+            if (std::abs(ay - by) < 10.0f) {
+                return a.box.center.x < b.box.center.x;
+            }
+            return ay < by;
+        });
+
         auto textlines = recognize(input, textBoxes);
         return {textBoxes, textlines};
     }
@@ -379,4 +391,70 @@ std::pair<std::vector<TextBox>, std::vector<Textline>> LiteOCREngine::recognize(
     return impl->run(img);
 }
 
+class LiteOCRTableEngineImpl {
+private:
+    std::unique_ptr<LiteOCR::PaddleSLANet> slaNet;
+
+public:
+    LiteOCRTableEngineImpl() {
+        
+    }
+
+    bool loadModel(const char* cnnParamPath, const char* cnnBinPath,
+                   const char* slaheadParamPath, const char* slaheadBinPath,
+                   const char* vocabPath,
+                   const LiteOCR::InferOption &opt) {
+        slaNet = std::make_unique<LiteOCR::PaddleSLANet>();
+        return slaNet->loadModel(cnnParamPath, cnnBinPath, slaheadParamPath, slaheadBinPath, vocabPath, opt);
+    }
+
+    bool loadModelFromBuffer(const char* cnnParamBuffer, const unsigned char* cnnBinBuffer,
+                             const char* slaheadParamBuffer, const unsigned char* slaheadBinBuffer,
+                             const char* vocabBuffer,
+                             const LiteOCR::InferOption &opt) {
+        slaNet = std::make_unique<LiteOCR::PaddleSLANet>();
+        return slaNet->loadModelFromBuffer(cnnParamBuffer, cnnBinBuffer, slaheadParamBuffer, slaheadBinBuffer, vocabBuffer, opt);
+    }
+
+    std::pair<std::string,std::vector<Rect>> run(const cv::Mat &input, const std::pair<std::vector<TextBox>, std::vector<Textline>> ocrResult) {
+        auto table_structure = slaNet->forward(input);
+        return merge_table_ocr(table_structure, ocrResult.first, ocrResult.second);
+    }
+};
+
+
+LiteOCRTableEngine::LiteOCRTableEngine() : impl(nullptr) {}
+LiteOCRTableEngine::~LiteOCRTableEngine() = default;
+
+bool LiteOCRTableEngine::loadModel(const char* cnnParamPath, const char* cnnBinPath,
+                                 const char* slaheadParamPath, const char* slaheadBinPath,
+                                 const char* vocabPath,
+                                 const InferOption &opt) {
+    impl = std::make_unique<LiteOCRTableEngineImpl>();
+    return impl->loadModel(cnnParamPath, cnnBinPath, slaheadParamPath, slaheadBinPath, vocabPath, opt);
+}
+
+bool LiteOCRTableEngine::loadModelFromBuffer(const char* cnnParamBuffer, const unsigned char* cnnBinBuffer,
+                                 const char* slaheadParamBuffer, const unsigned char* slaheadBinBuffer,
+                                 const char* vocabBuffer,
+                                 const InferOption &opt) {
+    impl = std::make_unique<LiteOCRTableEngineImpl>();
+    return impl->loadModelFromBuffer(cnnParamBuffer, cnnBinBuffer, slaheadParamBuffer, slaheadBinBuffer, vocabBuffer, opt);
+}
+
+std::pair<std::string,std::vector<Rect>> LiteOCRTableEngine::recognize(const void *cvMat, const std::pair<std::vector<TextBox>, std::vector<Textline>> ocrResult) {
+    const cv::Mat* mat = static_cast<const cv::Mat*>(cvMat);
+    return impl->run(*mat, ocrResult);
+}
+
+std::pair<std::string,std::vector<Rect>> LiteOCRTableEngine::recognize(const unsigned char* imgData, int width, int height, int channels, int cstep, const std::pair<std::vector<TextBox>, std::vector<Textline>> ocrResult) {
+    cv::Mat img(height, width, (channels == 1) ? CV_8UC1 : ((channels == 3) ? CV_8UC3 : CV_8UC4), (void*)imgData, cstep);
+    return impl->run(img, ocrResult);
+}
+
+std::pair<std::string,std::vector<Rect>> LiteOCRTableEngine::recognize(const unsigned char* imgData, int size, const std::pair<std::vector<TextBox>, std::vector<Textline>> ocrResult) {
+    std::vector<unsigned char> data(imgData, imgData + size);
+    cv::Mat img = cv::imdecode(data, cv::IMREAD_COLOR);
+    return impl->run(img, ocrResult);
+}
 } // namespace LiteOCR

@@ -1,3 +1,5 @@
 .vscode/
 .xmake/
 build/
+*.png
+*.jpg

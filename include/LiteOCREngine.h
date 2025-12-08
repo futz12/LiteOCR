@@ -34,6 +34,13 @@ namespace LiteOCR {
         float score;
     };
 
+    struct Rect {
+        float x;
+        float y;
+        float width;
+        float height;
+    };
+
     class LiteOCREngineImpl;
 
     class LiteOCREngine {
@@ -63,6 +70,33 @@ namespace LiteOCR {
 
     private:
         std::unique_ptr<LiteOCREngineImpl> impl; 
+    };
+
+    class LiteOCRTableEngineImpl;
+
+    class LiteOCRTableEngine {
+    public:
+        LiteOCRTableEngine();
+        ~LiteOCRTableEngine();
+
+        bool loadModel(const char* cnnParamPath, const char* cnnBinPath,
+                       const char* slaheadParamPath, const char* slaheadBinPath,
+                       const char* vocabPath,
+                       const InferOption &opt = InferOption());
+
+        bool loadModelFromBuffer(const char* cnnParamBuffer, const unsigned char* cnnBinBuffer,
+                                 const char* slaheadParamBuffer, const unsigned char* slaheadBinBuffer,
+                                 const char* vocabBuffer,
+                                 const InferOption &opt = InferOption());
+
+        std::pair<std::string,std::vector<Rect>> recognize(const void *cvMat, const std::pair<std::vector<TextBox>, std::vector<Textline>> ocrResult);
+
+        std::pair<std::string,std::vector<Rect>> recognize(const unsigned char* imgData, int width, int height, int channels, int cstep, const std::pair<std::vector<TextBox>, std::vector<Textline>> ocrResult);
+
+        std::pair<std::string,std::vector<Rect>> recognize(const unsigned char* imgData, int size, const std::pair<std::vector<TextBox>, std::vector<Textline>> ocrResult);
+    
+    private:
+        std::unique_ptr<LiteOCRTableEngineImpl> impl;
     };
 
 } // namespace LiteOCR

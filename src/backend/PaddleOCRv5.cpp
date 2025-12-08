@@ -88,7 +88,7 @@ namespace LiteOCR {
         in_pad.substract_mean_normalize(mean_vals, norm_vals);
 
         auto ex = model.create_extractor();
-        ex.input("in0", in);
+        ex.input("in0", in_pad);
         ncnn::Mat out;
         ex.extract("out0", out);
         cv::Mat output(out.h, out.w, CV_32FC1, out.data);

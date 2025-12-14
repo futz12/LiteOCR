@@ -20,8 +20,6 @@ LiteOCR is a lightweight Optical Character Recognition (OCR) library designed fo
 
 - [ ] LatexOCR
 
-- [ ] Textline SR
-
 ## TODO
 
 - [ ] Full Pipeline for PaddleOCR

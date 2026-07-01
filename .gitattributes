@@ -1,0 +1,5 @@
+# Auto-normalize line endings for text files.
+* text=auto
+
+# Ensure shell scripts keep LF even on Windows.
+*.sh text eol=lf

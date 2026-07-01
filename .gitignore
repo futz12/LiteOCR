@@ -1,0 +1,28 @@
+.vscode/
+.xmake/
+build/
+cmake-build-*/
+build_*/
+.cache/
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles/
+*.png
+!logo.png
+*.jpg
+
+# Python packaging
+.venv/
+.venv*/
+dist/
+*.egg-info/
+__pycache__/
+.pytest_cache/
+python/liteocr/*.dll
+python/liteocr/*.so
+python/liteocr/*.dylib
+
+# Model files are not tracked in git.
+# Download them from the mirror instead (see models/README.md).
+/models/*
+!/models/README.md

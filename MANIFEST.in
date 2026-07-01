@@ -1,0 +1,19 @@
+include CMakeLists.txt
+include Readme.md
+include LICENSE
+
+recursive-include include *.h
+recursive-include src *.cpp *.h *.hpp
+recursive-include cmake *.cmake
+recursive-include ncnn CMakeLists.txt
+recursive-include ncnn/cmake *.cmake
+recursive-include ncnn/src *.cpp *.h *.hpp *.c
+recursive-include ncnn/build-tools *
+recursive-include ncnn/glslang CMakeLists.txt
+recursive-include ncnn/glslang/**/*.cmake
+recursive-include ncnn/glslang/src *.cpp *.h *.hpp
+recursive-include python *.py
+recursive-include tests *.cpp
+
+recursive-exclude build *
+recursive-exclude *.egg-info *

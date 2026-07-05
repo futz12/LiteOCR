@@ -25,6 +25,7 @@ from ._types import (
 from .components import (
     Detector,
     DocOrientation,
+    LatexOCR,
     Recognizer,
     SLANet,
     TextlineOrientation,
@@ -59,10 +60,12 @@ from .imgproc import (
     warp_perspective,
 )
 from .presets import (
+    download_latexocr_preset,
     download_orientation_preset,
     download_preset,
     download_table_preset,
     ensure_preset,
+    list_latexocr_presets,
     list_orientation_presets,
     list_presets,
     list_table_presets,
@@ -92,6 +95,7 @@ __all__ = [
     "DocOrientation",
     "UVDoc",
     "SLANet",
+    "LatexOCR",
     # Image processing
     "COLOR_GRAY",
     "COLOR_RGB",
@@ -122,10 +126,12 @@ __all__ = [
     "download_preset",
     "download_orientation_preset",
     "download_table_preset",
+    "download_latexocr_preset",
     "ensure_preset",
     "list_presets",
     "list_orientation_presets",
     "list_table_presets",
+    "list_latexocr_presets",
     "merge_text_boxes",
     "ctc_decode",
 ]

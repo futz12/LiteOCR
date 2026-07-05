@@ -165,6 +165,46 @@ liteocr_free_table_cells(structure, structure_count);
 liteocr_table_engine_destroy(table_engine);
 ```
 
+## LaTeX 公式识别
+
+```c
+liteocr_latexocr_t latexocr = liteocr_latexocr_create();
+
+liteocr_latexocr_model_paths_t latex_paths = {
+    "./models/PP-FormulaNet_plus_S_encoder.param",
+    "./models/PP-FormulaNet_plus_S_encoder.bin",
+    "./models/PP-FormulaNet_plus_S_embed.param",
+    "./models/PP-FormulaNet_plus_S_embed.bin",
+    "./models/PP-FormulaNet_plus_S_decoder.param",
+    "./models/PP-FormulaNet_plus_S_decoder.bin",
+    "./models/PP-FormulaNet_plus_S_vocab.txt"
+};
+
+liteocr_infer_option_t latex_opt = {};
+latex_opt.num_threads = 8;
+latex_opt.gpu_device_id = -1;
+
+if (liteocr_latexocr_load_model(latexocr, &latex_paths, &latex_opt) != 0) {
+    liteocr_latexocr_destroy(latexocr);
+    return 1;
+}
+
+liteocr_image_t formula_img = liteocr_imread("formula.png", 3);
+if (!formula_img.data) {
+    liteocr_latexocr_destroy(latexocr);
+    return 1;
+}
+
+char* latex = liteocr_latexocr_recognize_image(latexocr, &formula_img);
+if (latex) {
+    printf("%s\n", latex);
+    liteocr_free_string(latex);
+}
+
+liteocr_free_image(&formula_img);
+liteocr_latexocr_destroy(latexocr);
+```
+
 ## 单独调用检测器
 
 ```c
@@ -277,6 +317,18 @@ python examples/python/example_table.py table.png
 python examples/python/example_batch.py ./images --ext png,jpg
 ```
 
+### LaTeX 公式识别
+
+```python
+import liteocr
+
+engine = liteocr.LatexOCR()
+engine.load_preset("PP-FormulaNet_plus_S", model_dir="models")
+
+latex = engine.recognize("formula.png")
+print(latex)
+```
+
 ### 更多示例
 
 - `example_ocr_numpy.py`：从 NumPy 数组识别。
@@ -284,6 +336,7 @@ python examples/python/example_batch.py ./images --ext png,jpg
 - `example_detector_recognizer.py`：单独调用 Detector / Recognizer。
 - `example_doc_orientation.py`：文档方向分类。
 - `example_uvdoc.py`：UVDoc 文档畸变校正。
+- `example_latexocr.py`：LaTeX 公式识别。
 
 详细信息请参考 [`examples/python/README.md`](../examples/python/README.md) 中的说明。
 

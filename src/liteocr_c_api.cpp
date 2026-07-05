@@ -5,6 +5,7 @@
 #include "liteocr_image.h"
 #include "liteocr_imgproc.h"
 #include "contours/liteocr_contours.h"
+#include "backend/liteocr_latexocr.h"
 
 #include <cstdlib>
 #include <cstring>
@@ -866,6 +867,46 @@ int liteocr_slanet_forward(liteocr_slanet_t sla, const liteocr_image_t* input,
         }
     }
     return 0;
+}
+
+/* liteocr_latexocr */
+liteocr_latexocr_t liteocr_latexocr_create(void) {
+    return new liteocr_latexocr();
+}
+
+void liteocr_latexocr_destroy(liteocr_latexocr_t m) {
+    delete m;
+}
+
+int liteocr_latexocr_load_model(liteocr_latexocr_t m, const liteocr_latexocr_model_paths_t* paths,
+                                const liteocr_infer_option_t* opt) {
+    if (!m || !paths) return -1;
+    return liteocr_latexocr_load_model(m,
+        paths->encoder_param, paths->encoder_bin,
+        paths->embed_param, paths->embed_bin,
+        paths->decoder_param, paths->decoder_bin,
+        paths->vocab, optionFromC(opt)) ? 0 : -1;
+}
+
+char* liteocr_latexocr_recognize_image(liteocr_latexocr_t m, const liteocr_image_t* img) {
+    if (!m || !img) return nullptr;
+    liteocr_image image = imageFromC(img);
+    if (image.empty()) return nullptr;
+    std::string result = liteocr_latexocr_recognize(m, image);
+    return LITEOCR_STRDUP(result.c_str());
+}
+
+char* liteocr_latexocr_recognize_raw(liteocr_latexocr_t m,
+    const unsigned char* data, int width, int height, int channels, int stride) {
+    if (!m || !data || width <= 0 || height <= 0) return nullptr;
+    if (channels != 1 && channels != 3 && channels != 4) return nullptr;
+    if (stride < width * channels) return nullptr;
+    liteocr_image_type t = (channels == 1) ? liteocr_image_type::LITEOCR_IMAGE_U8C1 :
+                           (channels == 3) ? liteocr_image_type::LITEOCR_IMAGE_U8C3 : liteocr_image_type::LITEOCR_IMAGE_U8C4;
+    liteocr_image image(width, height, t, const_cast<unsigned char*>(data), stride);
+    if (image.empty()) return nullptr;
+    std::string result = liteocr_latexocr_recognize(m, image);
+    return LITEOCR_STRDUP(result.c_str());
 }
 
 /* ============================================================================

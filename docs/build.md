@@ -111,3 +111,20 @@ cmake -S . -B build -DLITEOCR_EXTRA_NCNN_LAYERS="foo;bar"
 - 链接 `LiteOCR`
 - 链接或可访问 ncnn 依赖
 
+## Python 共享库
+
+Python `ctypes` 封装需要动态库。CMake 中通过 `LITEOCR_BUILD_SHARED` 选项开启：
+
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLITEOCR_BUILD_SHARED=ON
+cmake --build build --config Release --target LiteOCRShared
+```
+
+构建产物为：
+
+- Windows：`build/Release/liteocr.dll`
+- Linux：`build/libliteocr.so`
+- macOS：`build/libliteocr.dylib`
+
+`setup.py` / `pip install .` 会自动启用该目标并把动态库打包进 wheel，一般无需手动编译。
+

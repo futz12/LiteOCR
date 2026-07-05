@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 import ctypes
+import os
 from pathlib import Path
 from typing import List, Optional, Union
 
-from ._native import CImage, CTableCell, c_str, lib
+from ._native import CImage, CTableCell, CLatexOCRModelPaths, c_str, lib
 from ._types import InferOption, TableCell
 from .image import Image
+from . import presets
 
 
 class _BaseComponent:
@@ -193,3 +195,108 @@ class SLANet(_BaseComponent):
 
         lib.liteocr_free_table_cells(cells_ptr, count.value)
         return cells
+
+
+class LatexOCR:
+    """PP-FormulaNet formula recognizer: image -> LaTeX string."""
+
+    def __init__(self, opt: Optional[InferOption] = None):
+        self._opt = opt if opt is not None else InferOption()
+        self._c_opt = self._opt.to_c()
+        self._handle = lib.liteocr_latexocr_create()
+        if not self._handle:
+            raise RuntimeError("Failed to create LatexOCR engine")
+
+    def load_model(
+        self,
+        encoder_param: Union[str, Path],
+        encoder_bin: Union[str, Path],
+        embed_param: Union[str, Path],
+        embed_bin: Union[str, Path],
+        decoder_param: Union[str, Path],
+        decoder_bin: Union[str, Path],
+        vocab: Union[str, Path],
+    ) -> "LatexOCR":
+        """Load encoder/embed/decoder model files and the tokenizer vocab."""
+        paths = CLatexOCRModelPaths(
+            encoder_param=c_str(encoder_param),
+            encoder_bin=c_str(encoder_bin),
+            embed_param=c_str(embed_param),
+            embed_bin=c_str(embed_bin),
+            decoder_param=c_str(decoder_param),
+            decoder_bin=c_str(decoder_bin),
+            vocab=c_str(vocab),
+        )
+        rc = lib.liteocr_latexocr_load_model(
+            self._handle, ctypes.byref(paths), ctypes.byref(self._c_opt)
+        )
+        if rc != 0:
+            raise RuntimeError(f"Failed to load LatexOCR model (error code {rc})")
+        return self
+
+    def load_preset(
+        self,
+        name: str,
+        model_dir: str = "models",
+        download: bool = True,
+    ) -> "LatexOCR":
+        """Load a named LaTeX formula recognition preset, optionally downloading missing files."""
+        if download:
+            paths = presets.download_latexocr_preset(name, model_dir)
+        else:
+            paths = {k: Path(model_dir) / v for k, v in presets._LATEXOCR_PRESETS[name].items()}
+        return self.load_model(
+            encoder_param=paths["encoder_param"],
+            encoder_bin=paths["encoder_bin"],
+            embed_param=paths["embed_param"],
+            embed_bin=paths["embed_bin"],
+            decoder_param=paths["decoder_param"],
+            decoder_bin=paths["decoder_bin"],
+            vocab=paths["vocab"],
+        )
+
+    def recognize(self, image: Union[Image, Any, str, os.PathLike]) -> str:
+        """Recognize a formula image and return a LaTeX string.
+
+        ``image`` may be:
+        * an :class:`Image` instance,
+        * a file path string,
+        * a NumPy array (H, W) or (H, W, C) uint8.
+        """
+        if isinstance(image, Image):
+            return self._recognize_image(image)
+        if isinstance(image, (str, os.PathLike)):
+            return self._recognize_image(Image.from_file(image))
+
+        img = Image.from_numpy(image)
+        return self._recognize_image(img)
+
+    def _recognize_image(self, image: Image) -> str:
+        text_ptr = lib.liteocr_latexocr_recognize_image(
+            self._handle, ctypes.byref(image._img)
+        )
+        if text_ptr is None:
+            raise RuntimeError("LatexOCR recognition failed")
+        text = ctypes.cast(text_ptr, ctypes.c_char_p).value.decode("utf-8")
+        lib.liteocr_free_string(ctypes.c_char_p(text_ptr))
+        return text
+
+    def _recognize_raw(self, image: Image) -> str:
+        text_ptr = lib.liteocr_latexocr_recognize_raw(
+            self._handle,
+            image._img.data,
+            image._img.width,
+            image._img.height,
+            image._img.channels,
+            image._img.stride,
+        )
+        if text_ptr is None:
+            raise RuntimeError("LatexOCR recognition failed")
+        text = ctypes.cast(text_ptr, ctypes.c_char_p).value.decode("utf-8")
+        lib.liteocr_free_string(ctypes.c_char_p(text_ptr))
+        return text
+
+    def __del__(self):
+        if getattr(self, "_handle", None):
+            lib.liteocr_latexocr_destroy(self._handle)
+            self._handle = None

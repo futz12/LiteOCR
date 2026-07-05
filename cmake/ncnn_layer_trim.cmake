@@ -64,7 +64,7 @@ set(_LITEOCR_NCNN_LAYERS_DEFAULT
 function(_liteocr_detect_layers_from_models out_var)
     set(_required_layers "noop")
 
-    file(GLOB _param_files "${CMAKE_CURRENT_SOURCE_DIR}/models/*.param")
+    file(GLOB_RECURSE _param_files "${CMAKE_CURRENT_SOURCE_DIR}/models/*.param")
     foreach(_param IN LISTS _param_files)
         if(NOT EXISTS "${_param}")
             continue()

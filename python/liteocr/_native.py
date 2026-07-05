@@ -156,6 +156,18 @@ class CTableModelBuffers(ctypes.Structure):
     ]
 
 
+class CLatexOCRModelPaths(ctypes.Structure):
+    _fields_ = [
+        ("encoder_param", ctypes.c_char_p),
+        ("encoder_bin", ctypes.c_char_p),
+        ("embed_param", ctypes.c_char_p),
+        ("embed_bin", ctypes.c_char_p),
+        ("decoder_param", ctypes.c_char_p),
+        ("decoder_bin", ctypes.c_char_p),
+        ("vocab", ctypes.c_char_p),
+    ]
+
+
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -509,3 +521,30 @@ lib.liteocr_ctc_decode.argtypes = [
     ctypes.POINTER(ctypes.c_int),
 ]
 lib.liteocr_ctc_decode.restype = ctypes.c_int
+
+
+# ---------------------------------------------------------------------------
+# LatexOCR
+# ---------------------------------------------------------------------------
+
+lib.liteocr_latexocr_create.argtypes = []
+lib.liteocr_latexocr_create.restype = ctypes.c_void_p
+
+lib.liteocr_latexocr_destroy.argtypes = [ctypes.c_void_p]
+lib.liteocr_latexocr_destroy.restype = None
+
+lib.liteocr_latexocr_load_model.argtypes = [
+    ctypes.c_void_p, ctypes.POINTER(CLatexOCRModelPaths), ctypes.POINTER(CInferOption),
+]
+lib.liteocr_latexocr_load_model.restype = ctypes.c_int
+
+lib.liteocr_latexocr_recognize_image.argtypes = [
+    ctypes.c_void_p, ctypes.POINTER(CImage),
+]
+lib.liteocr_latexocr_recognize_image.restype = ctypes.c_void_p
+
+lib.liteocr_latexocr_recognize_raw.argtypes = [
+    ctypes.c_void_p, ctypes.POINTER(ctypes.c_ubyte), ctypes.c_int, ctypes.c_int,
+    ctypes.c_int, ctypes.c_int,
+]
+lib.liteocr_latexocr_recognize_raw.restype = ctypes.c_void_p

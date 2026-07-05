@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -91,6 +91,7 @@ typedef struct liteocr_textline_ori*  liteocr_textline_ori_t;
 typedef struct liteocr_doc_ori*       liteocr_doc_ori_t;
 typedef struct liteocr_uvdoc*         liteocr_uvdoc_t;
 typedef struct liteocr_slanet*        liteocr_slanet_t;
+typedef struct liteocr_latexocr*      liteocr_latexocr_t;
 
 /* ---------- 模型路径结构体 ---------- */
 
@@ -317,6 +318,27 @@ int liteocr_slanet_load_model_from_buffer(liteocr_slanet_t sla,
 /* forward 返回cells需 liteocr_free_table_cells 释放 */
 int liteocr_slanet_forward(liteocr_slanet_t sla, const liteocr_image_t* input,
     liteocr_table_cell_t** out_cells, int* out_count);
+
+/* LatexOCR (PP-FormulaNet: 图像 -> LaTeX 字符串) */
+
+typedef struct {
+    const char* encoder_param;
+    const char* encoder_bin;
+    const char* embed_param;
+    const char* embed_bin;
+    const char* decoder_param;
+    const char* decoder_bin;
+    const char* vocab;
+} liteocr_latexocr_model_paths_t;
+
+liteocr_latexocr_t liteocr_latexocr_create(void);
+void liteocr_latexocr_destroy(liteocr_latexocr_t m);
+int liteocr_latexocr_load_model(liteocr_latexocr_t m, const liteocr_latexocr_model_paths_t* paths,
+                                const liteocr_infer_option_t* opt);
+/* recognize 返回 malloc 的 LaTeX 字符串，需 liteocr_free_string 释放；失败返回 NULL */
+char* liteocr_latexocr_recognize_image(liteocr_latexocr_t m, const liteocr_image_t* img);
+char* liteocr_latexocr_recognize_raw(liteocr_latexocr_t m,
+    const unsigned char* data, int width, int height, int channels, int stride);
 
 /* CTC Decoder */
 int liteocr_ctc_decode(const liteocr_image_t* probs, int blank_index,

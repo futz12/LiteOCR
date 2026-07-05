@@ -79,6 +79,18 @@ _TABLE_PRESETS: Dict[str, Dict[str, str]] = {
     },
 }
 
+_LATEXOCR_PRESETS: Dict[str, Dict[str, str]] = {
+    "PP-FormulaNet_plus_S": {
+        "encoder_param": "PP-FormulaNet_plus_S_encoder.param",
+        "encoder_bin": "PP-FormulaNet_plus_S_encoder.bin",
+        "embed_param": "PP-FormulaNet_plus_S_embed.param",
+        "embed_bin": "PP-FormulaNet_plus_S_embed.bin",
+        "decoder_param": "PP-FormulaNet_plus_S_decoder.param",
+        "decoder_bin": "PP-FormulaNet_plus_S_decoder.bin",
+        "vocab": "PP-FormulaNet_plus_S_vocab.txt",
+    },
+}
+
 
 def list_presets() -> List[str]:
     """Return all supported OCR preset names."""
@@ -91,8 +103,13 @@ def list_orientation_presets() -> List[str]:
 
 
 def list_table_presets() -> List[str]:
-    """Return all supported table preset names."""
+    """Return all supported table recognition preset names."""
     return list(_TABLE_PRESETS.keys())
+
+
+def list_latexocr_presets() -> List[str]:
+    """Return all supported LaTeX formula recognition preset names."""
+    return list(_LATEXOCR_PRESETS.keys())
 
 
 def _download_file(url: str, dest: Path, chunk_size: int = 8192) -> None:
@@ -168,6 +185,20 @@ def download_table_preset(
             f"Available presets: {', '.join(list_table_presets())}"
         )
     return _resolve_paths(_TABLE_PRESETS[name], Path(model_dir), overwrite)
+
+
+def download_latexocr_preset(
+    name: str,
+    model_dir: str = "models",
+    overwrite: bool = False,
+) -> Dict[str, Path]:
+    """Download the files for a LaTeX formula recognition preset."""
+    if name not in _LATEXOCR_PRESETS:
+        raise ValueError(
+            f"Unknown LatexOCR preset {name!r}. "
+            f"Available presets: {', '.join(list_latexocr_presets())}"
+        )
+    return _resolve_paths(_LATEXOCR_PRESETS[name], Path(model_dir), overwrite)
 
 
 def ensure_preset(

@@ -55,6 +55,12 @@ Python 封装提供了**模型预设**，可以按名称自动下载并加载常
 |--------|------|
 | `PP-StructureV2_SLANet_plus` | 表格结构解析 |
 
+### 支持的 LaTeX 公式识别预设
+
+| 预设名 | 说明 |
+|--------|------|
+| `PP-FormulaNet_plus_S` | PP-FormulaNet plus S，数学公式 → LaTeX |
+
 ## 使用示例
 
 ### 使用预设自动下载并识别
@@ -91,6 +97,18 @@ for line in result.lines:
     print(line.text)
 ```
 
+### LaTeX 公式识别
+
+```python
+import liteocr
+
+engine = liteocr.LatexOCR()
+engine.load_preset("PP-FormulaNet_plus_S", model_dir="models")
+
+latex = engine.recognize("formula.png")
+print(latex)
+```
+
 ### 从 NumPy 数组识别
 
 ```python
@@ -118,10 +136,14 @@ liteocr.download_orientation_preset("PP-LCNet_textline_ori", model_dir="models")
 # 下载表格预设
 liteocr.download_table_preset("PP-StructureV2_SLANet_plus", model_dir="models")
 
+# 下载 LaTeX 公式识别预设
+liteocr.download_latexocr_preset("PP-FormulaNet_plus_S", model_dir="models")
+
 # 查看所有预设
 print(liteocr.list_presets())
 print(liteocr.list_orientation_presets())
 print(liteocr.list_table_presets())
+print(liteocr.list_latexocr_presets())
 ```
 
 ## 主要 API
@@ -140,6 +162,13 @@ print(liteocr.list_table_presets())
   - `load_model(cnn_param, cnn_bin, slahead_param, slahead_bin, vocab)`：加载表格模型。
   - `load_preset(name, model_dir="models", download=True)`：按表格预设加载。
   - `recognize(image, ocr_result)`：根据 OCR 结果解析表格，返回 HTML / cells / structure。
+
+### LaTeX 公式识别
+
+- `liteocr.LatexOCR(opt=None)`：LaTeX 公式识别引擎。
+  - `load_model(encoder_param, encoder_bin, embed_param, embed_bin, decoder_param, decoder_bin, vocab)`：加载 encoder / embed / decoder 模型和词表。
+  - `load_preset(name, model_dir="models", download=True)`：按 LaTeX 预设加载。
+  - `recognize(image)`：识别公式图片，返回 LaTeX 字符串。支持文件路径、NumPy 数组或 `liteocr.Image`。
 
 ### 底层模型组件
 
@@ -183,8 +212,8 @@ print(liteocr.list_table_presets())
 
 - `liteocr.InferOption`：推理选项，包括 `num_threads`、`gpu_device_id`、`use_fp16` 等。
 - `liteocr.ctc_decode(probs, blank_index)`：CTC 解码。
-- `liteocr.download_preset` / `liteocr.download_orientation_preset` / `liteocr.download_table_preset`：下载模型。
-- `liteocr.list_presets` / `liteocr.list_orientation_presets` / `liteocr.list_table_presets`：列出预设。
+- `liteocr.download_preset` / `liteocr.download_orientation_preset` / `liteocr.download_table_preset` / `liteocr.download_latexocr_preset`：下载模型。
+- `liteocr.list_presets` / `liteocr.list_orientation_presets` / `liteocr.list_table_presets` / `liteocr.list_latexocr_presets`：列出预设。
 
 ## 运行测试
 

@@ -238,6 +238,60 @@ int liteocr_table_engine_recognize_buffer(
 
 当前高层表格接口依赖 OCR 结果作为输入，因此通常先调用 OCR 引擎获得 `boxes` 和 `lines`。
 
+## LaTeX 公式识别
+
+### 创建和销毁
+
+```c
+liteocr_latexocr_t liteocr_latexocr_create(void);
+void liteocr_latexocr_destroy(liteocr_latexocr_t m);
+```
+
+### 模型路径
+
+```c
+typedef struct {
+    const char* encoder_param;
+    const char* encoder_bin;
+    const char* embed_param;
+    const char* embed_bin;
+    const char* decoder_param;
+    const char* decoder_bin;
+    const char* vocab;
+} liteocr_latexocr_model_paths_t;
+```
+
+### 加载模型
+
+```c
+int liteocr_latexocr_load_model(
+    liteocr_latexocr_t m,
+    const liteocr_latexocr_model_paths_t* paths,
+    const liteocr_infer_option_t* opt);
+```
+
+### 识别图片
+
+```c
+char* liteocr_latexocr_recognize_image(
+    liteocr_latexocr_t m,
+    const liteocr_image_t* img);
+```
+
+### 识别原始像素
+
+```c
+char* liteocr_latexocr_recognize_raw(
+    liteocr_latexocr_t m,
+    const unsigned char* data,
+    int width,
+    int height,
+    int channels,
+    int stride);
+```
+
+返回的 LaTeX 字符串需要用 `liteocr_free_string` 释放；失败时返回 `NULL`。
+
 ## 底层模型组件
 
 LiteOCR 也允许单独调用底层模型。

@@ -31,6 +31,7 @@ set(LITEOCR_SOURCES
     src/backend/liteocr_docinfer.cpp
     src/backend/liteocr_uvdoc.cpp
     src/backend/liteocr_paddleocrv5.cpp
+    src/backend/liteocr_latexocr.cpp
     src/contours/liteocr_findcontours.cpp
     src/contours/liteocr_contourutils.cpp
     src/liteocr_image.cpp
@@ -92,7 +93,7 @@ endforeach()
 set_tests_properties(test_textlineori test_docori PROPERTIES SKIP_RETURN_CODE 77)
 
 # Examples.
-foreach(example_name detector recognizer baseocr uvdoc slanet tableocr)
+foreach(example_name detector recognizer baseocr uvdoc slanet tableocr latexocr)
     add_executable(example_${example_name} examples/example_${example_name}.cpp)
     target_include_directories(example_${example_name} PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/examples

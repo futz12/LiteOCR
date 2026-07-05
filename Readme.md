@@ -23,7 +23,7 @@
 - 🖥️ **跨平台**：支持 Windows、Linux 与 macOS。
 - 🔌 **多语言接口**：提供 C API 与 Python 绑定，方便接入 C/C++、Python 项目。
 - 📦 **即装即用**：`pip install .` 自动构建并打包原生动态库，开箱即用。
-- 🔧 **模型覆盖**：内置 PaddleOCR 检测/识别、文本行方向、文档方向、UVDoc 畸变校正、表格识别等 pipeline。
+- 🔧 **模型覆盖**：内置 PaddleOCR 检测/识别、文本行方向、文档方向、UVDoc 畸变校正、表格识别、LaTeX 公式识别等 pipeline。
 - 🎛️ **灵活构建**：支持 bundled ncnn 或系统 ncnn，可选 Vulkan GPU 加速。
 
 ---
@@ -39,7 +39,7 @@
 | UVDoc 畸变校正 | ✅ |
 | 表格识别 (TableRec) | ✅ |
 | 版面分析 (Layout) | ⏳ |
-| LaTeX OCR | ⏳ |
+| LaTeX OCR | ✅ |
 
 ## 📝 TODO
 

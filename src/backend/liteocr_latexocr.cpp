@@ -3,9 +3,11 @@
 #include "liteocr_imgproc.h"
 
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <fstream>
 #include <regex>
+#include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -722,6 +724,59 @@ static std::string post_process_formula(std::string s) {
     return trim_ws(s);
 }
 
+static bool configure_decoder_variant(
+    liteocr_latexocr* m, const char* decoder_param) {
+    std::ifstream file(decoder_param);
+    if (!file.is_open()) return false;
+
+    int mha_count = 0;
+    int masked_mha_count = 0;
+    int cached_mha_count = 0;
+    int decoder_hidden_size = 0;
+    std::string line;
+    while (std::getline(file, line)) {
+        std::istringstream stream(line);
+        std::string type;
+        std::string name;
+        int bottom_count = 0;
+        int top_count = 0;
+        if (!(stream >> type >> name >> bottom_count >> top_count)) continue;
+        if (type != "MultiHeadAttention") continue;
+
+        ++mha_count;
+        std::string field;
+        for (int i = 0; i < bottom_count + top_count; ++i) {
+            if (!(stream >> field)) return false;
+        }
+        while (stream >> field) {
+            if (field.compare(0, 2, "0=") == 0) {
+                decoder_hidden_size = std::atoi(field.c_str() + 2);
+            } else if (field == "5=1") {
+                ++masked_mha_count;
+            } else if (field == "7=1") {
+                ++cached_mha_count;
+            }
+        }
+    }
+
+    if (mha_count == 0 || masked_mha_count * 2 != mha_count ||
+        cached_mha_count != mha_count) {
+        return false;
+    }
+
+    m->num_layers = masked_mha_count;
+    if (m->num_layers == 2 && decoder_hidden_size == 384) {
+        m->parallel_step = 3;
+        m->max_new_tokens = 1024;
+    } else if (m->num_layers == 6 && decoder_hidden_size == 512) {
+        m->parallel_step = 1;
+        m->max_new_tokens = 2560;
+    } else {
+        return false;
+    }
+    return true;
+}
+
 }  // namespace
 
 // ========== 模型加载 ==========
@@ -734,6 +789,8 @@ bool liteocr_latexocr_load_model(liteocr_latexocr* m,
     const liteocr_infer_option& opt) {
     if (!m) return false;
     m->loaded = false;
+
+    if (!configure_decoder_variant(m, decoder_param)) return false;
 
     liteocr_apply_net_options(m->encoder_net, opt);
     liteocr_apply_net_options(m->embed_net, opt);
@@ -757,8 +814,11 @@ bool liteocr_latexocr_load_model(liteocr_latexocr* m,
         m->id_to_token.push_back(line);
     }
 
-    m->kv_cache.clear();
-    m->kv_cache.resize((size_t)m->num_layers);
+    if ((int)m->id_to_token.size() != m->vocab_size) return false;
+    m->self_kv_cache.clear();
+    m->self_kv_cache.resize((size_t)m->num_layers);
+    m->cross_kv_cache.clear();
+    m->cross_kv_cache.resize((size_t)m->num_layers);
     m->loaded = true;
     return true;
 }
@@ -779,7 +839,10 @@ std::string liteocr_latexocr_recognize(liteocr_latexocr* m, const liteocr_image&
     if (encoder_out.empty()) return std::string();
 
     // 2. 重置 KV-cache
-    m->kv_cache.assign((size_t)m->num_layers, std::make_pair(ncnn::Mat(), ncnn::Mat()));
+    m->self_kv_cache.assign(
+        (size_t)m->num_layers, std::make_pair(ncnn::Mat(), ncnn::Mat()));
+    m->cross_kv_cache.assign(
+        (size_t)m->num_layers, std::make_pair(ncnn::Mat(), ncnn::Mat()));
 
     // 3. 并行 greedy 生成（PP-FormulaNet_plus-S 使用 parallel_step=3）
     //    - prefill：输入 P 个 BOS，位置 [0..P-1]，mask (P,P) 全 0（组内双向）
@@ -831,26 +894,46 @@ std::string liteocr_latexocr_recognize(liteocr_latexocr* m, const liteocr_image&
         }
 
         // 3c. decoder：输入 encoder_out / embeds / mask（+ 上一步 cache）
-        ncnn::Mat k0, v0, k1, v1, logits;
+        std::vector<std::pair<ncnn::Mat, ncnn::Mat>> next_self_cache(
+            (size_t)m->num_layers);
+        std::vector<std::pair<ncnn::Mat, ncnn::Mat>> next_cross_cache(
+            (size_t)m->num_layers);
+        ncnn::Mat logits;
         {
             ncnn::Extractor ex = m->decoder_net.create_extractor();
             ex.input("in0", encoder_out);
             ex.input("in1", embeds);
             ex.input("in2", mask);
             if (!is_prefill) {
-                ex.input("cache_k0", m->kv_cache[0].first);
-                ex.input("cache_v0", m->kv_cache[0].second);
-                ex.input("cache_k1", m->kv_cache[1].first);
-                ex.input("cache_v1", m->kv_cache[1].second);
+                for (int i = 0; i < m->num_layers; ++i) {
+                    const std::string suffix = std::to_string(i);
+                    ex.input(("self_cache_k" + suffix).c_str(),
+                             m->self_kv_cache[(size_t)i].first);
+                    ex.input(("self_cache_v" + suffix).c_str(),
+                             m->self_kv_cache[(size_t)i].second);
+                    ex.input(("cross_cache_k" + suffix).c_str(),
+                             m->cross_kv_cache[(size_t)i].first);
+                    ex.input(("cross_cache_v" + suffix).c_str(),
+                             m->cross_kv_cache[(size_t)i].second);
+                }
             }
-            ex.extract("out_cache_k0", k0);
-            ex.extract("out_cache_v0", v0);
-            ex.extract("out_cache_k1", k1);
-            ex.extract("out_cache_v1", v1);
-            m->kv_cache[0] = std::make_pair(k0, v0);
-            m->kv_cache[1] = std::make_pair(k1, v1);
-            ex.extract("out0", logits);
+            for (int i = 0; i < m->num_layers; ++i) {
+                const std::string suffix = std::to_string(i);
+                if (ex.extract(("out_self_cache_k" + suffix).c_str(),
+                               next_self_cache[(size_t)i].first) != 0 ||
+                    ex.extract(("out_self_cache_v" + suffix).c_str(),
+                               next_self_cache[(size_t)i].second) != 0 ||
+                    ex.extract(("out_cross_cache_k" + suffix).c_str(),
+                               next_cross_cache[(size_t)i].first) != 0 ||
+                    ex.extract(("out_cross_cache_v" + suffix).c_str(),
+                               next_cross_cache[(size_t)i].second) != 0) {
+                    return std::string();
+                }
+            }
+            if (ex.extract("out0", logits) != 0) return std::string();
         }
+        m->self_kv_cache.swap(next_self_cache);
+        m->cross_kv_cache.swap(next_cross_cache);
         if (logits.empty()) break;
 
         // 3d. argmax 每行 logits -> P 个新 token

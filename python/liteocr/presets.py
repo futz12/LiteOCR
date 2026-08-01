@@ -89,6 +89,15 @@ _LATEXOCR_PRESETS: Dict[str, Dict[str, str]] = {
         "decoder_bin": "PP-FormulaNet_plus_S_decoder.bin",
         "vocab": "PP-FormulaNet_plus_S_vocab.txt",
     },
+    "PP-FormulaNet_plus_M": {
+        "encoder_param": "PP-FormulaNet_plus_M_encoder.param",
+        "encoder_bin": "PP-FormulaNet_plus_M_encoder.bin",
+        "embed_param": "PP-FormulaNet_plus_M_embed.param",
+        "embed_bin": "PP-FormulaNet_plus_M_embed.bin",
+        "decoder_param": "PP-FormulaNet_plus_M_decoder.param",
+        "decoder_bin": "PP-FormulaNet_plus_M_decoder.bin",
+        "vocab": "PP-FormulaNet_plus_M_vocab.txt",
+    },
 }
 
 

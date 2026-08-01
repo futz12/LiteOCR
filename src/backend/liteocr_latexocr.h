@@ -9,7 +9,7 @@
 
 struct liteocr_infer_option;
 
-// LatexOCR 后端：PP-FormulaNet_plus-S 公式识别（图像 -> LaTeX 字符串）
+// LatexOCR 后端：PP-FormulaNet_plus-S/M 公式识别（图像 -> LaTeX 字符串）
 // 三段式 ncnn 子网：encoder（PPHGNetV2 视觉编码）+ embed（token/位置嵌入）
 //                  + decoder（含 KV-cache 的 MBart 解码器，greedy 生成）
 struct liteocr_latexocr {
@@ -20,8 +20,9 @@ struct liteocr_latexocr {
     // 词表：第 N 行对应 id=N 的 token 字符串（ByteLevel BPE 编码后的 unicode 形式）
     std::vector<std::string> id_to_token;
 
-    // 自注意力 KV-cache：num_layers 对 (k, v)，每步滚动更新
-    std::vector<std::pair<ncnn::Mat, ncnn::Mat>> kv_cache;
+    // 自注意力和交叉注意力 KV-cache：各 num_layers 对 (k, v)
+    std::vector<std::pair<ncnn::Mat, ncnn::Mat>> self_kv_cache;
+    std::vector<std::pair<ncnn::Mat, ncnn::Mat>> cross_kv_cache;
 
     bool loaded = false;
 

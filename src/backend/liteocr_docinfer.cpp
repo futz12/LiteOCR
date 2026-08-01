@@ -139,7 +139,7 @@
             fprintf(stderr, "[LiteOCR]Failed to load PaddleSLANet CNN param file from %s\n", cnnParamPath);
             return false;
         }
-        if (sla->cnn_model.load_model(cnnBinPath) == 0) {
+        if (sla->cnn_model.load_model(cnnBinPath) != 0) {
             fprintf(stderr, "[LiteOCR]Failed to load PaddleSLANet CNN bin file from %s\n", cnnBinPath);
             return false;
         }
@@ -147,7 +147,7 @@
             fprintf(stderr, "[LiteOCR]Failed to load PaddleSLANet SLA-Head param file from %s\n", slaheadParamPath);
             return false;
         }
-        if (sla->slahead_model.load_model(slaheadBinPath) == 0) {
+        if (sla->slahead_model.load_model(slaheadBinPath) != 0) {
             fprintf(stderr, "[LiteOCR]Failed to load PaddleSLANet SLA-Head bin file from %s\n", slaheadBinPath);
             return false;
         }
@@ -184,7 +184,7 @@
             fprintf(stderr, "[LiteOCR]Failed to load PaddleSLANet CNN param from buffer\n");
             return false;
         }
-        if (sla->cnn_model.load_model(cnnBinBuffer) == 0) {
+        if (sla->cnn_model.load_model(cnnBinBuffer) != 0) {
             fprintf(stderr, "[LiteOCR]Failed to load PaddleSLANet CNN bin from buffer\n");
             return false;
         }
@@ -192,7 +192,7 @@
             fprintf(stderr, "[LiteOCR]Failed to load PaddleSLANet SLA-Head param from buffer\n");
             return false;
         }
-        if (sla->slahead_model.load_model(slaheadBinBuffer) == 0) {
+        if (sla->slahead_model.load_model(slaheadBinBuffer) != 0) {
             fprintf(stderr, "[LiteOCR]Failed to load PaddleSLANet SLA-Head bin from buffer\n");
             return false;
         }

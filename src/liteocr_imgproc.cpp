@@ -102,15 +102,19 @@ extern "C" void liteocr_resize(const uint8_t* src, int src_w, int src_h, int src
 void liteocr_rotate90(const uint8_t* src, int src_w, int src_h, int src_step, int channels,
                       uint8_t* dst, int dst_step, bool counter_clockwise)
 {
-    int type = counter_clockwise ? 3 : 1;
-    int dst_w = src_h;
-    int dst_h = src_w;
-    if (channels == 1)
-        ncnn::kanna_rotate_c1(src, src_w, src_h, src_step, dst, dst_w, dst_h, dst_step, type);
-    else if (channels == 3)
-        ncnn::kanna_rotate_c3(src, src_w, src_h, src_step, dst, dst_w, dst_h, dst_step, type);
-    else if (channels == 4)
-        ncnn::kanna_rotate_c4(src, src_w, src_h, src_step, dst, dst_w, dst_h, dst_step, type);
+    // Deterministic 90-degree rotation. Note: ncnn::kanna_rotate_c{1,3,4}
+    // type 3 is clockwise, not counter-clockwise; using the ncnn type mapping
+    // here silently rotated in the wrong direction.
+    for (int y = 0; y < src_h; ++y) {
+        const uint8_t* s = src + y * src_step;
+        for (int x = 0; x < src_w; ++x) {
+            int dx = counter_clockwise ? y : (src_h - 1 - y);
+            int dy = counter_clockwise ? (src_w - 1 - x) : x;
+            uint8_t* d = dst + dy * dst_step + dx * channels;
+            for (int c = 0; c < channels; ++c)
+                d[c] = s[x * channels + c];
+        }
+    }
 }
 
 extern "C" void liteocr_rotate180(const uint8_t* src, int src_w, int src_h, int src_step, int channels,
